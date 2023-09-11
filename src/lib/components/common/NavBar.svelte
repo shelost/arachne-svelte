@@ -4,65 +4,191 @@
 	import { page } from '$app/stores';
 	import QuickLinks from '../private/QuickLinks.svelte';
 	import { applyAction, enhance, type SubmitFunction } from '$app/forms';
-	import { loading } from '$lib/stores';
+	import logo from '$lib/img/scrollable.svg';
+	import X from '$lib/img/x.svg'
+
+
 	import { invalidate } from '$app/navigation';
 
+
 	const handleLogout: SubmitFunction = () => {
-		loading.set(true);
+		//loading.set(true);
 		return async ({ result }) => {
 			if (result.type === 'redirect') {
 				await invalidate('supabase:auth');
 			} else {
 				await applyAction(result);
 			}
-			loading.set(false);
+			//loading.set(false);
 		};
 	};
 
 </script>
 
 
-<AppBar>
+<div id = 'navbar'>
 	<!-- Branding -->
-	<svelte:fragment slot="lead">
-		<a href="/" class="text-sm sm:text-lg md:text-3xl font-bold uppercase mr-4" title="Return to Homepage">{SITE_NAME}</a>
-	</svelte:fragment>
-	<!-- Navigation -->
-	<svelte:fragment slot="trail">
-		{#if !$page.url.pathname.startsWith('/dashboard')}
-			<section class="hidden lg:flex space-x-4">
-				<a class="btn" href="/pricing">Pricing</a>
-			</section>
-			<Divider vertical borderWidth="border-l-2" />
-		{/if}
-		<!-- Light Switch -->
-		<section class="flex space-x-4 items-center">
-			<LightSwitch origin="tr" />
-			<Divider vertical borderWidth="border-l-2" />
-			{#if $page.data.session?.user && $page.url.pathname.startsWith('/dashboard')}
-					<!-- <button class="btn-icon btn-filled-primary">
-						<span>
-							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
-								<path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clip-rule="evenodd" />
-							</svg>	
-						</span>
-					</button> -->
-					{#if $page.data.session}
-						<form action="/logout" method="post" use:enhance={handleLogout}>
-							<button class="btn btn-filled-primary" disabled={$loading}>Sign out</button>
-						</form>
-					{/if}
-			{:else}
-				<a class="btn btn-filled-primary btn-sm" href="/dashboard">
-					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25" />
-					</svg>
-					<span class="hidden sm:block">Dashboard</span>
+
+		<a href="/">
+			<img id = 'logo' src = {X} alt = 'Scrollable Logo'>
+		</a>
+
+	<!-- Middle Section -->
+
+	<div class = 'text-btns'>
+
+		{#if !$page.url.pathname.startsWith('/home')}
+
+		<!--
+			<a href="/">
+				<h2 class = 'text-btn'>
+					Home
+				</h2>
+			</a>
+			<a href="/about">
+				<h2 class = 'text-btn'>
+					About
+				</h2>
+			</a>
+			<a href="/contact">
+				<h2 class = 'text-btn'>
+					Contact
+				</h2>
+			</a>
+			-->
+
+
+		{:else}
+				<a href="/home">
+					<h2 class = 'text-btn'>
+						Home
+					</h2>
 				</a>
+				<a href="/settings">
+					<h2 class = 'text-btn'>
+						Settings
+					</h2>
+				</a>
+				<a href="/subscriptions">
+					<h2 class = 'text-btn'>
+						Subscriptions
+					</h2>
+				</a>
+
+		{/if}
+	</div>
+
+	<!-- Button -->
+		{#if $page.data.session?.user && $page.url.pathname.startsWith('/home')}
+			{#if $page.data.session}
+				<form action="/logout" method="post" use:enhance={handleLogout}>
+					<button>
+						<h1> Log Out</h1>
+					</button>
+				</form>
 			{/if}
-		</section>
-	</svelte:fragment>
-</AppBar>
-{#if $page.data.session?.user && $page.url.pathname.startsWith('/dashboard')}
-	<QuickLinks />
-{/if}
+		{:else}
+
+		<div id = 'buttons'>
+			<a class="button" href="/home">
+				<h2>
+					Sign Up
+				</h2>
+
+			</a>
+
+			<a class="button" href="/home">
+				<button>
+					<h1> Log In </h1>
+				</button>
+			</a>
+		</div>
+
+
+		{/if}
+
+
+
+</div>
+
+
+<style lang="scss">
+
+	#buttons{
+		display: flex;
+		align-items: center;
+		gap: 20px;
+
+		h2{
+			font-size: 14px;
+			font-weight: 600;
+			letter-spacing: -0.2px;
+		}
+	}
+
+	#navbar{
+		height: 64px;
+		top: 0px;
+		left: 0px;
+		/*position: fixed;*/
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 20px 20px;
+		color: black;
+		width: 100vw;
+		backdrop-filter: blur(15px);
+		z-index: 6 !important;
+	}
+
+	#logo{
+		height: 26px;
+	}
+
+	button{
+		background: #FF004D;
+		color: white;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 5px;
+		padding: 10px 20px;
+		border-radius: 30px;
+		font-size: 14px;
+		font-weight: 600;
+		box-shadow: none;
+		transition: 0.2s ease;
+	}
+
+	button:hover{
+		background: #ea0008;
+	}
+
+	button h1{
+		font-size: 14px;
+		margin: 0;
+	}
+
+	.text-btns{
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 20px;
+	}
+
+	.text-btn{
+		color: black;
+		text-decoration: none;
+		font-family: 'Inter', sans-serif;
+		font-weight: 500;
+		letter-spacing: -0.5px;
+		font-size: 15px;
+	}
+
+	@media screen and (max-width: 800px){
+		.text-btn{
+			display: none;
+		}
+	}
+
+</style>

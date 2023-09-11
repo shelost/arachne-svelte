@@ -2,7 +2,8 @@ import { getSupabase } from '@supabase/auth-helpers-sveltekit';
 import { AuthApiError } from '@supabase/supabase-js';
 import type { Actions, RequestEvent } from './$types';
 // @ts-ignore
-import { invalid, redirect, type ValidationError } from '@sveltejs/kit';
+import { fail, redirect, type ValidationError } from '@sveltejs/kit';
+import {supabaseClient} from '$lib/db'
 
 export const actions: Actions = {
 	async login(event: RequestEvent): Promise<ValidationError<{ error: string; values?: { email: string } }>> {
@@ -14,12 +15,12 @@ export const actions: Actions = {
 		const password = formData.get('password') as string;
 
 		if (!email) {
-			return invalid(400, {
+			return fail(400, {
 				error: 'Please enter your email'
 			});
 		}
 		if (!password) {
-			return invalid(400, {
+			return fail(400, {
 				error: 'Please enter your password',
 				values: {
 					email
@@ -27,24 +28,29 @@ export const actions: Actions = {
 			});
 		}
 
+
+
 		const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
 		if (error) {
 			if (error instanceof AuthApiError && error.status === 400) {
-				return invalid(400, {
-					error: 'Invalid credentials.',
+				return fail(400, {
+					error: 'fail credentials.',
 					values: {
 						email
 					}
 				});
 			}
-			return invalid(500, {
-				error: 'Server error. Try again later.',
+			return fail(500, {
+				error: 'Server error. Try again later.' + error,
 				values: {
-					email
+					email,
 				}
 			});
 		};
-		throw redirect(303, '/dashboard');		
+
+
+
+		throw redirect(303, '/home');
 	},
 
 	async signup(
@@ -60,12 +66,12 @@ export const actions: Actions = {
 		const full_name = formData.get('full_name') as string;
 
 		if (!email) {
-			return invalid(400, {
+			return fail(400, {
 				error: 'Please enter your email'
 			});
 		}
 		if (!password) {
-			return invalid(400, {
+			return fail(400, {
 				error: 'Please enter a password',
 				values: {
 					email,
@@ -77,16 +83,20 @@ export const actions: Actions = {
 		const { error } = await supabaseClient.auth.signUp({
 			email,
 			password,
-			options: { 
+			options: {
 				emailRedirectTo: url.origin,
 				data: {full_name: full_name}
 			}
 		});
 
+
+
+
+
 		if (error) {
 			if (error instanceof AuthApiError && error.status === 400) {
-				return invalid(400, {
-					error: 'Invalid credentials.',
+				return fail(400, {
+					error: 'fail credentials.',
 					values: {
 						email,
 						full_name
@@ -94,8 +104,8 @@ export const actions: Actions = {
 				});
 			}
 
-			return invalid(500, {
-				error: 'Server error. Try again later.',
+			return fail(500, {
+				error: 'Server error. Try again later.' + error,
 				values: {
 					email,
 					full_name

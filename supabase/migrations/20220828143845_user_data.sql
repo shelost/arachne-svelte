@@ -1,4 +1,4 @@
-create table "public"."user_data" (
+create table "public"."users" (
     "id" uuid not null,
     "created_at" timestamp with time zone default now(),
     "email" text not null,
